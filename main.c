@@ -1,4 +1,4 @@
-//#include "draw.h"
+#include "draw.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -6,9 +6,26 @@
 #include "elf_read.h"
 
 
+
+
 /* Simulation Parameters */
 #define DMEM_SIZE	2^(14)	/* Data memory size (kb) for simulation */
 
+
+/* Lazy approach. Pass struct to functions instead */
+  const char* insn_type;
+  const char* insn_name;
+  uint8_t rd;
+  uint8_t rsa;
+  uint8_t rsb;
+  uint32_t PC = 0; /* Instruction Array Mapping */
+  uint32_t pc;   /* Actual PC value */
+  uint32_t entry_point;
+  uint32_t imm;
+  uint32_t* data_mem;
+  uint32_t registers[32];
+  uint32_t* insn_mem;
+#include "cpu.h"  
 
 
 
@@ -72,11 +89,10 @@ int main(int argc, char** argv){
 	dataseg_info dmem_info;
 
 	/* Memory Data */
-	uint32_t*	data_mem = calloc( DMEM_SIZE, sizeof( uint32_t ) );	
-	uint32_t* 	insn_mem = NULL; /* needs to be allocated after getting ELF file */
+	data_mem = calloc( DMEM_SIZE, sizeof( uint32_t ) );	
+	insn_mem = NULL; /* needs to be allocated after getting ELF file */
 
-	/* Register Data */
-	uint32_t	reg[31];
+	
 	uint32_t	pc;
 
 
@@ -140,16 +156,18 @@ int main(int argc, char** argv){
 	if( result ){
 		printf("Cannot parse elf\n");
 	}
-	pc = im_info.entry;	
+	pc = im_info.entry;
+        entry_point = pc;	
 
 	char input;
 	while( 1 ){
+		execute( &PC, &pc );
 		/* Drawing everything required before input */
 		input = getch();
 		if( check_run_key(input) ){
 			mvwprintw(asm_view, 1, 1, "Assembly Code");
 			display_asm( &asm_text, 0, parent_y - MENU_BAR_H-1 , asm_line_count);	
-			print_reg( reg, pc);
+			print_reg( registers, pc);
 			print_mem(&data_mem, 1, 1, dmem_info.start,  (parent_y - 16 - MENU_BAR_H), dmem_info.start);
 			
 			//mvwprintw(asm_view, 1, 3, "Run key pressed\n");	
