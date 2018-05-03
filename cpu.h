@@ -167,15 +167,17 @@ int32_t compi( void ){
 void lw( void ){ 
   uint32_t idx = registers[rsa] + imm;
   registers[rd] &= 0x0000FFFF;
-  registers[rd] = ((data_mem[idx]<< 24) & 0xFF000000) |  ((data_mem[idx+1] << 16) & 0x00FF0000) |  ((data_mem[idx+2] << 8) &  0x0000FF00) | (data_mem[idx+3] & 0x000000FF); 
-  insn_name = "comp";
+  registers[rd] = data_mem[idx];
+  //registers[rd] = ((data_mem[idx]<< 24) & 0xFF000000) |  ((data_mem[idx+1] << 16) & 0x00FF0000) |  ((data_mem[idx+2] << 8) &  0x0000FF00) | (data_mem[idx+3] & 0x000000FF); 
+  insn_name = "li";
   return;
 }
 
 void lth( void ){ 
   uint32_t idx = registers[rsa] + imm;
   registers[rd] &= 0x0000FFFF;
-  registers[rd] = ((data_mem[idx] << 16) & 0x00FF0000) |  ((data_mem[idx+1] << 8) &  0x0000FF00) | (data_mem[idx+2] & 0x000000FF);
+  registers[rd] = data_mem[idx] & 0x00FFFFFF;
+  //registers[rd] = ((data_mem[idx] << 16) & 0x00FF0000) |  ((data_mem[idx+1] << 8) &  0x0000FF00) | (data_mem[idx+2] & 0x000000FF);
   insn_name = "lth";
   return;
 }
@@ -183,7 +185,8 @@ void lth( void ){
 void lh( void ){ 
   uint32_t idx = registers[rsa] + imm;
   registers[rd] &= 0x0000FFFF;
-  registers[rd] = ((data_mem[idx] << 8) &  0x0000FF00) | (data_mem[idx+1] & 0x000000FF);
+  registers[rd] = data_mem[idx] & 0x0000FFFF;
+  //registers[rd] = ((data_mem[idx] << 8) &  0x0000FF00) | (data_mem[idx+1] & 0x000000FF);
   insn_name = "lh";
   return; 
 }
@@ -191,7 +194,6 @@ void lh( void ){
 void lb( void ){ 
   uint32_t idx = registers[rsa] + imm;
   registers[rd] &= 0x0000FFFF;
-  //cout << registers[2] << endl;  
   registers[rd] =  (data_mem[idx] & 0x000000FF);
   insn_name = "lb";
   return;
@@ -244,7 +246,6 @@ void lusi( void ){
 
 
 void lugi( void ){ 
-  registers[rd] &= 0x0000FFFF;
   registers[rd] &= 0x0000FFFF;
   registers[rd] |= (( imm << 16 ) & 0xFFFF0000);
   insn_name = "lugi";
@@ -304,36 +305,48 @@ void lungi( void ){
 //S Type
 void sw( void ){ 
   uint32_t idx = registers[rsa] + imm;
+  data_mem[idx] = registers[rsb];
+  /*
   data_mem[idx  ] =  (registers[rsb] >> 24) & 0x000000FF;
   data_mem[idx+1] =  (registers[rsb] >> 16) & 0x000000FF;
   data_mem[idx+2] =  (registers[rsb] >>  8) & 0x000000FF;
   data_mem[idx+3] =  (registers[rsb]      ) & 0x000000FF;
   insn_name = "sw";
+  */
   return;
 }
 
 void sh( void ){ 
   uint32_t idx = registers[rsa] + imm;
+  data_mem[idx] = registers[rsb] & 0x0000FFFF;
+  /*
   data_mem[idx  ] =  (registers[rsb] >>  8) & 0x000000FF;
   data_mem[idx+1] =  (registers[rsb]      ) & 0x000000FF;
   insn_name = "sh";
+  */
   return;
 }
 
 void sb( void ){ 
   uint32_t idx = registers[rsa] + imm;
+  data_mem[idx] = registers[rsb] & 0x000000FF;
+  /*
   data_mem[idx] = (registers[rsb] & 0x000000FF);
   insn_name = "sb";
+  */
   return;
 }
 
 
 void sth( void ){ 
   uint32_t idx = registers[rsa] + imm;
+  data_mem[idx] = registers[rsb] & 0x00FFFFFF;
+  /*
   data_mem[idx  ] =  (registers[rsb] >> 16) & 0x000000FF;
   data_mem[idx+1] =  (registers[rsb] >>  8) & 0x000000FF;
   data_mem[idx+2] =  (registers[rsb]      ) & 0x000000FF;
   insn_name = "sth";
+  */
   return;
 }
 
